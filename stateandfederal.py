@@ -7,7 +7,7 @@ def login_and_save_state(
     storage_file="stateandfederal.json"
 ):
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context()
         page = context.new_page()
         
@@ -34,7 +34,7 @@ def use_logged_in_session(url, storage_file="stateandfederal.json"):
         context = browser.new_context(storage_state=storage_file)
         page = context.new_page()
 
-        page.goto(url)
+        page.goto(url, timeout=60000)
         page.wait_for_timeout(5000)
         content = page.content()
         browser.close()

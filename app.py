@@ -134,17 +134,17 @@ def create_filter():
         db.session.add(filter_obj)
         db.session.commit()
         # hit workflow
-        url = "http://localhost:5678/webhook/e57db4a5-048f-47fa-a395-4dfe98f6aa7a"
+        #url = "http://localhost:5678/webhook/e57db4a5-048f-47fa-a395-4dfe98f6aa7a"
 
-        payload = json.dumps({
-            "filter_id": filter_obj.id
-            })
-        headers = {
-            'Content-Type': 'application/json'
-            }
-        response = requests.request("POST", url, headers=headers, data=payload)
+        #payload = json.dumps({
+        #    "filter_id": filter_obj.id
+        #    })
+        #headers = {
+        #    'Content-Type': 'application/json'
+        #    }
+        #response = requests.request("POST", url, headers=headers, data=payload)
 
-        print("Response from filter webhook: ", response.text)
+        #print("Response from filter webhook: ", response.text)
         return jsonify(filter_obj.to_dict()), 201
         
     except Exception as e:
