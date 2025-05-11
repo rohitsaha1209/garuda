@@ -26,9 +26,11 @@ class Status(db.Model):
 class Filter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     trades = db.Column(db.JSON, nullable=False)  # Array of trades
-    blacklisted_companies = db.Column(db.JSON, nullable=False)  # Array of blacklisted companies
+    blacklisted_companies = db.Column(db.JSON, nullable=False)
+    property_address = db.Column(db.String(200), nullable=False)
+    past_relationships = db.Column(db.JSON, nullable=False)
     project_size = db.Column(db.Enum(ProjectSize), nullable=False)
-    scope_of_work = db.Column(db.JSON, nullable=False)  # Array of scope of work
+    scope_of_work = db.Column(db.JSON, nullable=True)  # Array of scope of work
     project_budget = db.Column(db.Float, nullable=False)
     job_type = db.Column(db.String(50), nullable=False)
     building_type = db.Column(db.String(50), nullable=False)
@@ -43,6 +45,8 @@ class Filter(db.Model):
             'id': self.id,
             'trades': self.trades,
             'blacklisted_companies': self.blacklisted_companies,
+            'property_address': self.property_address,
+            'past_relationships': self.past_relationships,
             'project_size': self.project_size.value,
             'scope_of_work': self.scope_of_work,
             'project_budget': self.project_budget,
@@ -62,11 +66,12 @@ class Output(db.Model):
     project_start_date = db.Column(db.Date, nullable=True)
     project_end_date = db.Column(db.Date, nullable=True)
     project_cost = db.Column(db.String(50), nullable=False)
-    trade = db.Column(db.String(200), nullable=False)
+    trades = db.Column(db.JSON, nullable=False)
     scope_of_work = db.Column(db.String(100), nullable=False)
     complexity_of_the_project = db.Column(db.Text, nullable=True)
     area_of_expertise = db.Column(db.String(100), nullable=True)
     square_footage_of_work = db.Column(db.String(50), nullable=True)
+    project_size = db.Column(db.String(50), nullable=False)
     type_of_building = db.Column(db.String(100), nullable=False)
     type_of_job = db.Column(db.String(50), nullable=False)
     is_public_work = db.Column(db.Boolean, default=False)
@@ -85,12 +90,13 @@ class Output(db.Model):
             'location': self.location,
             'project_name': self.project_name,
             'project_description': self.project_description,
+            'project_size': self.project_size,
             'company': self.company,
             'bid_due_date': self.bid_due_date.strftime('%d-%m-%Y') if self.bid_due_date else None,
             'project_start_date': self.project_start_date.strftime('%d-%m-%Y') if self.project_start_date else None,
             'project_end_date': self.project_end_date.strftime('%d-%m-%Y') if self.project_end_date else None,
             'project_cost': self.project_cost,
-            'trade': self.trade,
+            'trades': self.trades,
             'scope_of_work': self.scope_of_work,
             'complexity_of_the_project': self.complexity_of_the_project,
             'area_of_expertise': self.area_of_expertise,
