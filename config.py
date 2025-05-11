@@ -10,3 +10,4 @@ class Config:
     STATE_AND_FEDERAL_LOGIN_URL = os.environ.get('STATE_AND_FEDERAL_URL') or 'https://www.stateandfederalbids.com/bids/myAccount'
     STATE_AND_FEDERAL_USERNAME = os.environ.get('STATE_AND_FEDERAL_USERNAME') or 'your_email@example.com'
     STATE_AND_FEDERAL_PASSWORD = os.environ.get('STATE_AND_FEDERAL_PASSWORD') or 'your_password'
+    GOOGLE_MAPS_API_KEY = os.environ.get('GOOGLE_MAPS_API_KEY') or 'your_google_maps_api_key'

@@ -9,11 +9,13 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from ranking3 import demo, geocode_location
 from stateandfederal import login_and_save_state, use_logged_in_session
+from rotating_geocoder import RotatingGeocoder
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 app.config.from_object(Config)
 db.init_app(app)
+geocoder = RotatingGeocoder()
 
 # Create database tables
 with app.app_context():
@@ -198,7 +200,7 @@ def create_output():
     try:
         output = output_data['output']
         print("This is size:", output['project_size'])
-        geocode = geocode_location(output['location'])
+        geocode = geocoder.geocode(output['location'])
         
         # Create new output record
         output_obj = Output(
