@@ -64,6 +64,7 @@ class Output(db.Model):
     company = db.Column(db.String(200), nullable=False)
     bid_due_date = db.Column(db.Date, nullable=True)
     project_start_date = db.Column(db.Date, nullable=True)
+    geocode = db.Column(db.JSON, nullable=True)
     project_end_date = db.Column(db.Date, nullable=True)
     project_cost = db.Column(db.String(50), nullable=False)
     trades = db.Column(db.JSON, nullable=False)
@@ -91,6 +92,7 @@ class Output(db.Model):
             'project_name': self.project_name,
             'project_description': self.project_description,
             'project_size': self.project_size,
+            'geocode': self.geocode,
             'company': self.company,
             'bid_due_date': self.bid_due_date.strftime('%d-%m-%Y') if self.bid_due_date else None,
             'project_start_date': self.project_start_date.strftime('%d-%m-%Y') if self.project_start_date else None,

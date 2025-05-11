@@ -96,60 +96,33 @@ def create_user():
 
 @app.route('/start_workflow', methods=['POST'])
 def create_filter():
-    Output.query.delete()
-    Filter.query.delete()
-    Status.query.delete()
-    status = Status(status="started")
-    db.session.add(status)
-    db.session.commit()
     data = request.get_json()
-    
-    # Validate required fields
-    required_fields = ['trades', 'blacklisted_companies', 'project_size', 
-                    'project_budget', 'job_type', 'building_type', 'property_address']
-    
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"{field} is required"}), 400
-    
-    try:
-        # Validate project_size enum
-        try:
-            project_size = ProjectSize(data['project_size'])
-        except ValueError:
-            return jsonify({"error": "Invalid project_size. Must be one of: small, medium, large"}), 400
-        
-        # Create new filter
-        filter_obj = Filter(
-            trades=data['trades'],
-            blacklisted_companies=data['blacklisted_companies'],
-            property_address=data['property_address'],
-            project_size=project_size,
-            project_budget=float(data['project_budget']),
-            job_type=data['job_type'],
-            building_type=data['building_type'],
-            past_relationships=data['past_relationships']
-        )
-        
-        db.session.add(filter_obj)
-        db.session.commit()
-        # hit workflow
-        #url = "http://localhost:5678/webhook/e57db4a5-048f-47fa-a395-4dfe98f6aa7a"
+    import requests
+    import json
 
-        #payload = json.dumps({
-        #    "filter_id": filter_obj.id
-        #    })
-        #headers = {
-        #    'Content-Type': 'application/json'
-        #    }
-        #response = requests.request("POST", url, headers=headers, data=payload)
+    url = "http://34.100.131.110/start_workflow"
 
-        #print("Response from filter webhook: ", response.text)
-        return jsonify(filter_obj.to_dict()), 201
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 400
+    payload = json.dumps(data)
+    headers = {
+    'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+    # hit workflow
+    url = "http://localhost:5678/webhook/e57db4a5-048f-47fa-a395-4dfe98f6aa7a"
+
+    payload = json.dumps({
+        "filter_id": ""
+        })
+    headers = {
+        'Content-Type': 'application/json'
+        }
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print("Response from filter webhook: ", response.text)
+    return jsonify({"message": response.text})
 
 @app.route('/get_latest_filter', methods=['GET'])
 def get_latest_filter():
@@ -204,9 +177,9 @@ def create_output():
         output_obj = Output(
             location=output['location'],
             project_name=output['project_name'],
+            geocode=geocode,
             project_description=output['project_description'],
             company=output['company'],
-            geocode=geocode,
             bid_due_date=datetime.strptime(output['bid_due_date'], '%d-%m-%Y').date() if output['bid_due_date']!="" else None,
             project_start_date=datetime.strptime(output['project_start_date'], '%d-%m-%Y').date() if output['project_start_date']!="" else None,
             project_end_date=datetime.strptime(output['project_end_date'], '%d-%m-%Y').date() if output['project_end_date']!="" else None,
@@ -270,6 +243,8 @@ def get_weighted_outputs():
     return jsonify(response)
 
 
+# STATE and Federal APIS
+
 @app.route('/login_state_and_federal', methods=['POST'])
 def login_state_and_federal():
     data = request.get_json()
@@ -292,4 +267,4 @@ def get_state_and_federal_bids():
 
 
 if __name__ == '__main__':
-    app.run(debug=True) 
+    app.run(port=5000,debug=True) 

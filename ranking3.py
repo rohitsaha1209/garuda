@@ -14,6 +14,7 @@ import logging
 # Set up logging (you can configure this as needed)
 logging.basicConfig(level=logging.INFO)
 
+
 def time_tracker(func):
     def wrapper(*args, **kwargs):
         start_time = time.time()
@@ -23,6 +24,35 @@ def time_tracker(func):
         logging.info(f"Function {func.__name__} took {duration:.4f} seconds")
         return result
     return wrapper
+
+def geocode_location(location_str: str) -> Optional[Dict[str, Any]]:
+        """
+        Convert a location string to latitude and longitude using OpenStreetMap's Nominatim API
+        """
+        encoded_location = requests.utils.quote(location_str)
+        url = f"https://nominatim.openstreetmap.org/search?format=json&q={encoded_location}"
+        
+        headers = {
+            "User-Agent": "BidRankingSystem/1.0"  # Required by Nominatim
+        }
+        
+        # Respect rate limits (1 request per second)
+        time.sleep(0.2)
+        
+        response = requests.get(url, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data and len(data) > 0:
+                return {
+                    "lat": float(data[0]["lat"]),
+                    "lon": float(data[0]["lon"]),
+                    "display_name": data[0]["display_name"]
+                }
+        
+        return None
+
+
 
 class BidRankingSystem:
     def __init__(self, model_name: str = "all-MiniLM-L6-v2"):
@@ -162,6 +192,7 @@ class BidRankingSystem:
     def calculate_location_score(self, 
                                user_location: str, 
                                bid_location: str, 
+                               bid_geocode,
                                use_driving_distance: bool = False) -> float:
         """
         Calculate a location score (0-1) based on proximity.
@@ -187,7 +218,7 @@ class BidRankingSystem:
         else:
             user_coords = self.user_geocoded_location
         
-        bid_coords = self.geocode_location(bid_location)
+        bid_coords = bid_geocode
         
         # If geocoding fails, use string similarity as fallback
         if not user_coords or not bid_coords:
@@ -398,6 +429,7 @@ class BidRankingSystem:
                 processed_bid['location_score'] = self.calculate_location_score(
                     user_params['location'], 
                     bid['location'],
+                    bid['geocode'],
                     use_driving_distance=user_params.get('use_driving_distance', False)
                 )
             
