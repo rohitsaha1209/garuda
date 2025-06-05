@@ -68,7 +68,7 @@ See `ranking3.py` for details.
 
 ## License
 
-MIT (or your chosen license)
+MIT 
 
 ---
 
